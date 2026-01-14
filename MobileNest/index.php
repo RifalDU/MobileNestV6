@@ -67,7 +67,8 @@ function getImageUrl($gambar_field) {
     position: relative;
     min-height: 60px;
 }
-.category-logo img {
+.category-logo img,
+.category-logo svg {
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -81,7 +82,10 @@ function getImageUrl($gambar_field) {
     justify-content: center;
     font-size: 14px;
     font-weight: bold;
-    color: #00a699;
+    color: #666;
+}
+.category-logo .logo-fallback svg {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 .product-badge {
     position: absolute;
@@ -183,11 +187,12 @@ function getImageUrl($gambar_field) {
                         <img src="<?php echo htmlspecialchars($logo_url); ?>" 
                              alt="<?php echo $brand_safe; ?> Logo" 
                              loading="lazy" 
+                             style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));"
                              onerror="this.style.display='none';document.getElementById('<?php echo $fallback_id; ?>').style.display='flex'">
                         <?php if ($embedded_svg): ?>
-                        <div id="<?php echo $fallback_id; ?>" class="logo-fallback"><?php echo $embedded_svg; ?></div>
+                        <div id="<?php echo $fallback_id; ?>" class="logo-fallback" style="color:#1f1f1f;"><?php echo $embedded_svg; ?></div>
                         <?php else: ?>
-                        <div id="<?php echo $fallback_id; ?>" class="logo-fallback"><?php echo substr($brand, 0, 2); ?></div>
+                        <div id="<?php echo $fallback_id; ?>" class="logo-fallback" style="background:#f0f0f0;border-radius:50%;color:#666;"><?php echo substr($brand, 0, 2); ?></div>
                         <?php endif; ?>
                     </div>
                     <h5><?php echo $brand_safe; ?></h5>
