@@ -7,7 +7,7 @@
 
 // Embedded SVG logos (these will ALWAYS work) - LARGER and BOLDER with BLACK COLOR
 $embedded_svgs = [
-    'Realme' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet"><defs><style>.realme-text{font-size:80px;font-weight:900;fill:#1f1f1f;font-family:Arial,Helvetica,sans-serif;letter-spacing:-5px}</style></defs><text x="100" y="150" text-anchor="middle" class="realme-text">Re</text></svg>',
+    'Realme' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet"><defs><style>.realme-r{font-size:120px;font-weight:900;fill:#1f1f1f;font-family:\'Arial Black\',Arial,sans-serif;letter-spacing:-10px}</style></defs><text x="100" y="155" text-anchor="middle" class="realme-r">R</text></svg>',
     'OPPO' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet"><defs><style>.oppo-text{font-size:80px;font-weight:900;fill:#1f1f1f;font-family:Arial,Helvetica,sans-serif;letter-spacing:-5px}</style></defs><text x="100" y="150" text-anchor="middle" class="oppo-text">OP</text></svg>',
 ];
 
@@ -34,13 +34,8 @@ $brand_logos = [
         'alt' => 'Vivo Logo'
     ],
     'Realme' => [
-        // Primary: PNG from multiple CDN mirrors (most reliable for Realme)
-        'image_urls' => [
-            'https://static.realme.com/static/images/realme_logo.png',
-            'https://cdn-images-1.medium.com/max/1200/1*VSHo3EWShE6d0Hw0-_lYOA.png',
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Realme_logo.svg/1024px-Realme_logo.svg.png'
-        ],
-        'image_url' => 'https://static.realme.com/static/images/realme_logo.png', // Primary
+        // Primary: Use simple-icons SVG which is cleaner (no background)
+        'image_url' => 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/realme.svg',
         'alt' => 'Realme Logo',
         'has_embedded' => true
     ]
@@ -82,7 +77,7 @@ function get_brand_logo_html($brand_name, $attributes = []) {
         $svg_id = 'svg-' . str_replace(' ', '-', strtolower($brand_name));
         return sprintf(
             '<div style="position:relative;display:inline-block;%s" data-brand="%s">
-                <img src="%s" alt="%s" class="%s" style="%s;object-fit:contain" loading="lazy" onerror="this.style.display=\'none\';document.getElementById(\'%s\').style.display=\'flex\'">
+                <img src="%s" alt="%s" class="%s" style="%s;object-fit:contain;filter:brightness(0) saturate(100%%)" loading="lazy" onerror="this.style.display=\'none\';document.getElementById(\'%s\').style.display=\'flex\'">
                 <div id="%s" style="display:none;%s;align-items:center;justify-content:center">%s</div>
             </div>',
             $style,
@@ -164,7 +159,7 @@ function get_brand_logo_with_visual_fallback($brand_name, $fallback_color = '#f0
     return sprintf(
         '<div style="position:relative;width:50px;height:50px;flex-shrink:0;">
             <img src="%s" alt="%s" 
-                 style="width:100%%;height:100%%;object-fit:contain;display:block;" 
+                 style="width:100%%;height:100%%;object-fit:contain;display:block;filter:brightness(0) saturate(100%%)" 
                  loading="lazy" 
                  onerror="%s">
             %s
