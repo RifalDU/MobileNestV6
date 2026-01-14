@@ -2,6 +2,7 @@
 /**
  * Brand Logo Configuration
  * Uses high-quality, reliable CDN sources for brand logos
+ * With comprehensive fallback system for robustness
  */
 
 $brand_logos = [
@@ -26,17 +27,15 @@ $brand_logos = [
         'alt' => 'Vivo Logo'
     ],
     'Realme' => [
-        // Primary: Logowik SVG - ultra reliable
-        'image_url' => 'https://logowik.com/data/file/1663/realme.svg',
+        // Primary: Wikimedia Commons high-quality PNG
+        'image_url' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Realme_logo.svg/400px-Realme_logo.svg.png',
         'alt' => 'Realme Logo',
         'fallback_urls' => [
-            // Backup 1: Logowik PNG alternative
+            // Backup 1: brandlogos.net
+            'https://brandlogos.net/wp-content/uploads/2021/04/realme-logo-brandlogos.net_.png',
+            // Backup 2: logowik PNG
             'https://logowik.com/data/file/1663/realme-1024.png',
-            // Backup 2: Wikimedia Commons SVG
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Realme_logo.svg/800px-Realme_logo.svg.png',
-            // Backup 3: uxwing SVG
-            'https://uxwing.com/download/svg/realme-logo-mobile-icon.svg',
-            // Backup 4: Simple phone icon fallback
+            // Backup 3: Fallback to phone icon
             'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/smartphone.svg'
         ]
     ]
