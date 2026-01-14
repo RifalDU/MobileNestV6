@@ -13,8 +13,9 @@ function getImageUrl($gambar_field) {
     
     // Check if it's a filename (local upload) or URL
     if (strpos($gambar_field, 'http') === false && strpos($gambar_field, '/') === false) {
-        // It's a filename - use UploadHandler to build URL from root context
-        return UploadHandler::getFileUrlFromRoot($gambar_field, 'produk');
+        // It's a filename - use admin/uploads path directly
+        // Since index.php is at root level, admin/uploads is accessible as sibling
+        return 'admin/uploads/produk/' . $gambar_field;
     } else {
         // It's already a URL
         return $gambar_field;
