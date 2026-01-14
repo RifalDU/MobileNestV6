@@ -106,7 +106,7 @@ while ($row = $result_produk->fetch_assoc()) {
 
 $total_produk = count($produk_list);
 
-// Helper function untuk build image URL
+// Helper function untuk build image URL dengan smart path resolution
 function getImageUrl($gambar_field) {
     if (empty($gambar_field)) {
         return '../assets/placeholder.png';
@@ -114,8 +114,8 @@ function getImageUrl($gambar_field) {
     
     // Check if it's a filename (local upload) or URL
     if (strpos($gambar_field, 'http') === false && strpos($gambar_field, '/') === false) {
-        // It's a filename - use UploadHandler to build URL
-        return UploadHandler::getFileUrl($gambar_field, 'produk');
+        // It's a filename - use UploadHandler dengan smart path untuk folder produk
+        return UploadHandler::getFileUrlFromProduk($gambar_field, 'produk');
     } else {
         // It's already a URL
         return $gambar_field;
@@ -407,7 +407,8 @@ function getImageUrl($gambar_field) {
                                     <div style="position: relative; overflow: hidden;">
                                         <img src="<?php echo htmlspecialchars(getImageUrl($produk['gambar'])); ?>" 
                                              alt="<?php echo htmlspecialchars($produk['nama_produk']); ?>" 
-                                             class="product-image">
+                                             class="product-image"
+                                             onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\"bi bi-phone\" style=\"font-size: 3rem; color: #ccc; margin: auto; display: flex; align-items: center; justify-content: center; width: 100%; height: 200px;\"></i>';">
                                         <span class="badge-kategori"><?php echo htmlspecialchars($produk['kategori']); ?></span>
                                     </div>
 
