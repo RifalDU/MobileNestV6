@@ -258,7 +258,7 @@ function adjustBrandLogoPath($logo_url) {
                          src="<?php echo htmlspecialchars($img_src); ?>" 
                          class="card-img-top" 
                          alt="<?php echo htmlspecialchars($row['nama_produk']); ?>"
-                         onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'card-img-top d-flex align-items-center justify-content-center bg-light\' style=\'height: 220px;\'>&lt;i class=\"bi bi-exclamation-triangle\" style=\"font-size: 3rem; color: #ccc;\"&gt;&lt;/i&gt;</div>';" />
+                         onerror="this.style.display='none'; var fallback=document.createElement('div'); fallback.className='card-img-top d-flex align-items-center justify-content-center bg-light'; fallback.style.height='220px'; fallback.innerHTML='<i class=&quot;bi bi-exclamation-triangle&quot; style=&quot;font-size: 3rem; color: #ccc;&quot;></i>'; this.parentElement.appendChild(fallback);" />
                     <?php else: ?>
                     <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 220px;">
                         <i class="bi bi-phone" style="font-size: 3rem; color: #ccc;"></i>
