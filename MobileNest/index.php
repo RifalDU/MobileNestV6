@@ -64,12 +64,24 @@ function getImageUrl($gambar_field) {
     background: #f8f9fa;
     border-radius: 10px;
     padding: 10px;
+    position: relative;
+    min-height: 60px;
 }
 .category-logo img {
     width: 100%;
     height: 100%;
     object-fit: contain;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+.category-logo .logo-fallback {
+    display: none;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: #00a699;
 }
 .product-badge {
     position: absolute;
@@ -160,13 +172,25 @@ function getImageUrl($gambar_field) {
             <?php
             $brands = ['Samsung', 'Xiaomi', 'Apple', 'OPPO', 'Vivo', 'Realme'];
             foreach($brands as $brand):
+                $logo_url = get_brand_logo_url($brand);
+                $embedded_svg = get_brand_embedded_svg($brand);
+                $brand_safe = htmlspecialchars($brand);
+                $fallback_id = 'fallback-' . strtolower(str_replace(' ', '-', $brand));
             ?>
             <div class="col-6 col-md-4 col-lg-2">
                 <a href="<?php echo SITE_URL; ?>/produk/list-produk.php?brand=<?php echo urlencode($brand); ?>" class="category-card">
                     <div class="category-logo">
-                        <img src="<?php echo get_brand_logo_url($brand); ?>" alt="<?php echo $brand; ?> Logo" loading="lazy" onerror="this.src='https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/smartphone.svg'">
+                        <img src="<?php echo htmlspecialchars($logo_url); ?>" 
+                             alt="<?php echo $brand_safe; ?> Logo" 
+                             loading="lazy" 
+                             onerror="this.style.display='none';document.getElementById('<?php echo $fallback_id; ?>').style.display='flex'">
+                        <?php if ($embedded_svg): ?>
+                        <div id="<?php echo $fallback_id; ?>" class="logo-fallback"><?php echo $embedded_svg; ?></div>
+                        <?php else: ?>
+                        <div id="<?php echo $fallback_id; ?>" class="logo-fallback"><?php echo substr($brand, 0, 2); ?></div>
+                        <?php endif; ?>
                     </div>
-                    <h5><?php echo $brand; ?></h5>
+                    <h5><?php echo $brand_safe; ?></h5>
                 </a>
             </div>
             <?php endforeach; ?>
