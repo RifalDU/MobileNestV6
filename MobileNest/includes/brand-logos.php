@@ -1,40 +1,53 @@
 <?php
 /**
  * Brand Logo Configuration
- * Uses high-quality SVG logos from reliable CDNs
- * Simple Icons (JSDelivr) + Wikimedia CDN for brands not in simple-icons
+ * Supports both:
+ * 1. CDN logos (via JSDelivr/Wikimedia)
+ * 2. Local custom logos (stored in uploads/logo/)
+ * 
+ * For local logos: simply set 'image_url' to relative path like '../uploads/logo/realme-logo.svg'
  */
 
 $brand_logos = [
     'Apple' => [
         'image_url' => 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/apple.svg',
-        'alt' => 'Apple Logo'
+        'alt' => 'Apple Logo',
+        'source' => 'cdn'
     ],
     'Samsung' => [
         'image_url' => 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/samsung.svg',
-        'alt' => 'Samsung Logo'
+        'alt' => 'Samsung Logo',
+        'source' => 'cdn'
     ],
     'Xiaomi' => [
         'image_url' => 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/xiaomi.svg',
-        'alt' => 'Xiaomi Logo'
+        'alt' => 'Xiaomi Logo',
+        'source' => 'cdn'
     ],
     'OPPO' => [
         'image_url' => 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/oppo.svg',
-        'alt' => 'OPPO Logo'
+        'alt' => 'OPPO Logo',
+        'source' => 'cdn'
     ],
     'Vivo' => [
         'image_url' => 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/vivo.svg',
-        'alt' => 'Vivo Logo'
+        'alt' => 'Vivo Logo',
+        'source' => 'cdn'
     ],
     'Realme' => [
-        // Using Wikimedia Commons - high quality Realme logo
+        // LOCAL CUSTOM LOGO - copy your logo to MobileNest/uploads/logo/realme-logo.svg
+        // Then change image_url to: '../uploads/logo/realme-logo.svg'
+        // Example: 'image_url' => '../uploads/logo/realme-logo.svg',
         'image_url' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Realme_logo.svg/1024px-Realme_logo.svg.png',
-        'alt' => 'Realme Logo'
+        'alt' => 'Realme Logo',
+        'source' => 'cdn'  // Change to 'local' when using local logo
     ]
 ];
 
 /**
  * Get brand logo URL with case-insensitive lookup
+ * Supports both CDN and local logos
+ * 
  * Supports: Apple, apple, APPLE, aPPle, etc.
  */
 function get_brand_logo_url($brand_name) {
@@ -78,6 +91,27 @@ function get_brand_logo_alt($brand_name) {
 }
 
 /**
+ * Get brand logo source (cdn or local)
+ */
+function get_brand_logo_source($brand_name) {
+    global $brand_logos;
+    
+    // First try exact match
+    if (isset($brand_logos[$brand_name])) {
+        return isset($brand_logos[$brand_name]['source']) ? $brand_logos[$brand_name]['source'] : 'cdn';
+    }
+    
+    // Then try case-insensitive match
+    foreach ($brand_logos as $key => $data) {
+        if (strtolower($key) === strtolower($brand_name)) {
+            return isset($data['source']) ? $data['source'] : 'cdn';
+        }
+    }
+    
+    return 'cdn';
+}
+
+/**
  * Get all available brands
  */
 function get_all_brands() {
@@ -115,7 +149,7 @@ function get_brand_embedded_svg($brand_name) {
 }
 
 /**
- * Simple brand logo HTML
+ * Simple brand logo HTML with support for both CDN and local logos
  */
 function get_brand_logo_html($brand_name, $attributes = []) {
     $logo_url = get_brand_logo_url($brand_name);
@@ -134,6 +168,7 @@ function get_brand_logo_html($brand_name, $attributes = []) {
 
 /**
  * Brand logo with visual fallback (initials in circle)
+ * Works with both CDN and local logos
  */
 function get_brand_logo_with_visual_fallback($brand_name, $fallback_color = '#f0f0f0') {
     $logo_url = get_brand_logo_url($brand_name);
@@ -158,5 +193,13 @@ function get_brand_logo_with_visual_fallback($brand_name, $fallback_color = '#f0
         htmlspecialchars($fallback_color),
         $initials
     );
+}
+
+/**
+ * HELPER: Format logo path for local uploads
+ * Usage: get_logo_path('realme-logo.svg') returns '../uploads/logo/realme-logo.svg'
+ */
+function get_logo_path($filename) {
+    return '../uploads/logo/' . basename($filename);
 }
 ?>
