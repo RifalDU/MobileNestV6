@@ -26,15 +26,17 @@ $brand_logos = [
         'alt' => 'Vivo Logo'
     ],
     'Realme' => [
-        // Primary: Seeklogo - proven working source
-        'image_url' => 'https://seeklogo.com/images/R/Realme-logo-3973FBF0F7-seeklogo.com.png',
+        // Primary: Logowik SVG - ultra reliable
+        'image_url' => 'https://logowik.com/data/file/1663/realme.svg',
         'alt' => 'Realme Logo',
         'fallback_urls' => [
-            // Backup 1: Alternative seeklogo format
-            'https://seeklogo.com/images/R/realme-logo-474287.png',
-            // Backup 2: logowik CDN
-            'https://logowik.com/data/file/1663/88.png',
-            // Backup 3: Simple phone icon as last resort
+            // Backup 1: Logowik PNG alternative
+            'https://logowik.com/data/file/1663/realme-1024.png',
+            // Backup 2: Wikimedia Commons SVG
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Realme_logo.svg/800px-Realme_logo.svg.png',
+            // Backup 3: uxwing SVG
+            'https://uxwing.com/download/svg/realme-logo-mobile-icon.svg',
+            // Backup 4: Simple phone icon fallback
             'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/smartphone.svg'
         ]
     ]
