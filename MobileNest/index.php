@@ -239,6 +239,11 @@ function adjustBrandLogoPath($logo_url) {
             
             if (mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
+                    // SKIP produk yang tidak lengkap (nama atau gambar kosong)
+                    if (empty($row['nama_produk']) || empty($row['gambar'])) {
+                        continue;
+                    }
+                    
                     $img_src = !empty($row['gambar']) ? getImageUrl($row['gambar']) : '';
                     $badge_index = $index % 3;
                     $product_fallback_id = 'product-img-' . $row['id_produk'];
@@ -253,7 +258,7 @@ function adjustBrandLogoPath($logo_url) {
                          src="<?php echo htmlspecialchars($img_src); ?>" 
                          class="card-img-top" 
                          alt="<?php echo htmlspecialchars($row['nama_produk']); ?>"
-                         onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'card-img-top d-flex align-items-center justify-content-center bg-light\' style=\'height: 220px;\'>❌ Gambar tidak tersedia</div>';" />
+                         onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'card-img-top d-flex align-items-center justify-content-center bg-light\' style=\'height: 220px;\'>&lt;i class=\"bi bi-exclamation-triangle\" style=\"font-size: 3rem; color: #ccc;\"&gt;&lt;/i&gt;</div>';" />
                     <?php else: ?>
                     <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 220px;">
                         <i class="bi bi-phone" style="font-size: 3rem; color: #ccc;"></i>
