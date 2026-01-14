@@ -26,14 +26,16 @@ $brand_logos = [
         'alt' => 'Vivo Logo'
     ],
     'Realme' => [
-        // Primary: High-quality PNG from jsDelivr (reliable CDN)
-        'image_url' => 'https://cdn.jsdelivr.net/gh/wyozi/company-logos@master/src/logos/realme.png',
+        // Primary: Seeklogo - proven working source
+        'image_url' => 'https://seeklogo.com/images/R/Realme-logo-3973FBF0F7-seeklogo.com.png',
         'alt' => 'Realme Logo',
         'fallback_urls' => [
-            // Backup 1: Alternative jsDelivr source
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Realme_logo.svg/1200px-Realme_logo.svg.png',
-            // Backup 2: SVG fallback
-            'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/realme.svg'
+            // Backup 1: Alternative seeklogo format
+            'https://seeklogo.com/images/R/realme-logo-474287.png',
+            // Backup 2: logowik CDN
+            'https://logowik.com/data/file/1663/88.png',
+            // Backup 3: Simple phone icon as last resort
+            'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/smartphone.svg'
         ]
     ]
 ];
