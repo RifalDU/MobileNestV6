@@ -13,23 +13,12 @@ function getImageUrl($gambar_field) {
     
     // Check if it's a filename (local upload) or URL
     if (strpos($gambar_field, 'http') === false && strpos($gambar_field, '/') === false) {
-        // It's a filename - use admin/uploads path directly
-        // Since index.php is at root level, admin/uploads is accessible as sibling
-        return 'admin/uploads/produk/' . $gambar_field;
+        // It's a filename - use UploadHandler to build URL
+        return UploadHandler::getFileUrl($gambar_field, 'produk');
     } else {
         // It's already a URL
         return $gambar_field;
     }
-}
-
-// Helper function untuk adjust path dari includes ke root context
-function adjustBrandLogoPath($logo_url) {
-    // Jika path dimulai dengan ../ dan di context index.php (root)
-    // Ubah ../ menjadi tidak ada (karena sudah di root)
-    if (strpos($logo_url, '../') === 0) {
-        return substr($logo_url, 3); // Remove "../"
-    }
-    return $logo_url;
 }
 ?>
 
@@ -74,29 +63,12 @@ function adjustBrandLogoPath($logo_url) {
     background: #f8f9fa;
     border-radius: 10px;
     padding: 10px;
-    position: relative;
-    min-height: 60px;
 }
-.category-logo img,
-.category-logo svg {
+.category-logo img {
     width: 100%;
     height: 100%;
     object-fit: contain;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-}
-/* Fallback div styling for logo display */
-.logo-fallback {
-    width: 60px;
-    height: 60px;
-    background-color: #f0f0f0;
-    border-radius: 10px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    color: #666;
-    font-size: 12px;
-    flex-shrink: 0;
 }
 .product-badge {
     position: absolute;
@@ -170,7 +142,7 @@ function adjustBrandLogoPath($logo_url) {
                 </div>
             </div>
             <div class="col-lg-5 text-center mt-5 mt-lg-0">
-                <img src="<?php echo SITE_URL; ?>/assets/images/logo.jpg" alt="MobileNest" class="img-fluid" style="max-height: 350px; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3)); border-radius: 15px;" onerror="this.src='<?php echo SITE_URL; ?>/assets/images/LogoMobileNest.png';">
+                <img src="<?php echo SITE_URL; ?>/assets/images/logo.jpg" alt="MobileNest" class="img-fluid" style="max-height: 350px; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
             </div>
         </div>
     </div>
@@ -187,32 +159,13 @@ function adjustBrandLogoPath($logo_url) {
             <?php
             $brands = ['Samsung', 'Xiaomi', 'Apple', 'OPPO', 'Vivo', 'Realme'];
             foreach($brands as $brand):
-                $logo_url = get_brand_logo_url($brand);
-                // Adjust path untuk context index.php (root level)
-                $logo_url = adjustBrandLogoPath($logo_url);
-                $logo_type = get_brand_logo_type($brand);
-                $brand_safe = htmlspecialchars($brand);
-                $brand_id = strtolower(str_replace(' ', '-', $brand));
-                $fallback_id = 'brand-fallback-' . $brand_id . '-' . uniqid();
-                $initials = substr($brand, 0, 2);
             ?>
             <div class="col-6 col-md-4 col-lg-2">
                 <a href="<?php echo SITE_URL; ?>/produk/list-produk.php?brand=<?php echo urlencode($brand); ?>" class="category-card">
                     <div class="category-logo">
-                        <img id="img-<?php echo htmlspecialchars($fallback_id); ?>" 
-                             src="<?php echo htmlspecialchars($logo_url); ?>" 
-                             alt="<?php echo $brand_safe; ?> Logo" 
-                             loading="lazy" 
-                             style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); display: block;" 
-                             onerror="this.style.display='none'; document.getElementById('<?php echo htmlspecialchars($fallback_id); ?>').style.display='flex';" />
-                        <!-- Fallback: Brand initials in circle -->
-                        <div id="<?php echo htmlspecialchars($fallback_id); ?>" 
-                             class="logo-fallback" 
-                             style="width: 60px; height: 60px; border-radius: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                            <?php echo htmlspecialchars($initials); ?>
-                        </div>
+                        <img src="<?php echo get_brand_logo_url($brand); ?>" alt="<?php echo $brand; ?> Logo" loading="lazy" onerror="this.src='https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/smartphone.svg'">
                     </div>
-                    <h5><?php echo $brand_safe; ?></h5>
+                    <h5><?php echo $brand; ?></h5>
                 </a>
             </div>
             <?php endforeach; ?>
@@ -230,35 +183,36 @@ function adjustBrandLogoPath($logo_url) {
         
         <div class="row g-4">
             <?php
-            $sql = "SELECT * FROM produk WHERE status_produk = 'Tersedia' ORDER BY tanggal_ditambahkan DESC LIMIT 8";
+            $sql = "SELECT * FROM produk WHERE status_produk = 'Tersedia' ORDER BY tanggal_ditambahkan DESC LIMIT 20";
             $result = mysqli_query($conn, $sql);
             
             $badges = ['Best Seller', 'Hot', 'Promo'];
             $badge_classes = ['badge-bestseller', 'badge-hot', 'badge-promo'];
             $index = 0;
+            $displayed = 0;
             
             if (mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
                     // SKIP produk yang tidak lengkap (nama atau gambar kosong)
-                    if (empty($row['nama_produk']) || empty($row['gambar'])) {
+                    if (empty(trim($row['nama_produk'])) || empty(trim($row['gambar']))) {
                         continue;
                     }
                     
-                    $img_src = !empty($row['gambar']) ? getImageUrl($row['gambar']) : '';
-                    $badge_index = $index % 3;
-                    $product_fallback_id = 'product-img-' . $row['id_produk'];
+                    // Hanya tampilkan 8 produk lengkap
+                    if ($displayed >= 8) {
+                        break;
+                    }
+                    
+                    $img_src = getImageUrl($row['gambar']);
+                    $badge_index = $displayed % 3;
             ?>
             <div class="col-6 col-md-4 col-lg-3">
                 <div class="card product-card h-100">
-                    <?php if($index < 6): ?>
+                    <?php if($displayed < 6): ?>
                     <span class="product-badge <?php echo $badge_classes[$badge_index]; ?>"><?php echo $badges[$badge_index]; ?></span>
                     <?php endif; ?>
                     <?php if (!empty($img_src)): ?>
-                    <img id="<?php echo htmlspecialchars($product_fallback_id); ?>" 
-                         src="<?php echo htmlspecialchars($img_src); ?>" 
-                         class="card-img-top" 
-                         alt="<?php echo htmlspecialchars($row['nama_produk']); ?>"
-                         onerror="this.style.display='none'; var fallback=document.createElement('div'); fallback.className='card-img-top d-flex align-items-center justify-content-center bg-light'; fallback.style.height='220px'; fallback.innerHTML='<i class=&quot;bi bi-exclamation-triangle&quot; style=&quot;font-size: 3rem; color: #ccc;&quot;></i>'; this.parentElement.appendChild(fallback);" />
+                    <img src="<?php echo htmlspecialchars($img_src); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($row['nama_produk']); ?>">
                     <?php else: ?>
                     <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 220px;">
                         <i class="bi bi-phone" style="font-size: 3rem; color: #ccc;"></i>
@@ -281,7 +235,7 @@ function adjustBrandLogoPath($logo_url) {
                 </div>
             </div>
             <?php 
-                    $index++;
+                    $displayed++;
                 }
             } else {
                 echo '<div class="col-12 text-center text-muted py-5">Belum ada produk tersedia.</div>';
