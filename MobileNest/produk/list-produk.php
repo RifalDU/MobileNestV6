@@ -45,6 +45,20 @@ function getImageUrl($gambar_field) {
         box-shadow: 0 8px 16px rgba(0,0,0,0.1) !important;
     }
 
+    .brand-logo-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .brand-logo-container img,
+    .brand-logo-container svg {
+        width: 25px;
+        height: 25px;
+        object-fit: contain;
+        flex-shrink: 0;
+    }
+
     @media (max-width: 768px) {
         .product-grid {
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -81,12 +95,20 @@ function getImageUrl($gambar_field) {
                                 foreach ($available_brands as $brand):
                                     $logo_data = get_brand_logo_data($brand);
                                     if ($logo_data):
+                                        $logo_url = isset($logo_data['image_url']) ? $logo_data['image_url'] : '';
+                                        $embedded_svg = get_brand_embedded_svg($brand);
+                                        $fallback_id = 'brand-fallback-' . strtolower(str_replace(' ', '-', $brand));
                                 ?>
                                 <div class="form-check d-flex align-items-center mb-2 p-2" style="cursor: pointer;">
-                                    <div style="width: 28px; height: 28px; margin-right: 8px; flex-shrink: 0;">
-                                        <img src="<?php echo htmlspecialchars($logo_data['image_url']); ?>" 
+                                    <div class="brand-logo-container" style="margin-right: 8px; flex-shrink: 0;">
+                                        <img src="<?php echo htmlspecialchars($logo_url); ?>" 
                                              alt="<?php echo htmlspecialchars($brand); ?> Logo" 
-                                             style="width: 100%; height: 100%; object-fit: contain;" />
+                                             onerror="this.style.display='none';document.getElementById('<?php echo $fallback_id; ?>').style.display='flex'" />
+                                        <?php if ($embedded_svg): ?>
+                                        <div id="<?php echo $fallback_id; ?>" style="display:none;width:25px;height:25px;align-items:center;justify-content:center;flex-shrink:0;"><?php echo $embedded_svg; ?></div>
+                                        <?php else: ?>
+                                        <div id="<?php echo $fallback_id; ?>" style="display:none;width:25px;height:25px;align-items:center;justify-content:center;flex-shrink:0;background:#f0f0f0;border-radius:50%;font-weight:bold;font-size:10px;color:#666;"><?php echo substr($brand, 0, 2); ?></div>
+                                        <?php endif; ?>
                                     </div>
                                     <div class="form-check" style="flex-grow: 1;">
                                         <input class="form-check-input brand-checkbox" type="checkbox" 
@@ -173,6 +195,9 @@ function getImageUrl($gambar_field) {
                             $brand_logo = get_brand_logo_data($produk['merek']);
                             // Build image URL dengan helper function
                             $image_url = !empty($produk['gambar']) ? getImageUrl($produk['gambar']) : '';
+                            $logo_url = isset($brand_logo['image_url']) ? $brand_logo['image_url'] : '';
+                            $embedded_svg = get_brand_embedded_svg($produk['merek']);
+                            $brand_fallback_id = 'product-brand-fallback-' . $produk['id_produk'];
                     ?>
                     <div class="product-card" data-product-id="<?php echo $produk['id_produk']; ?>">
                         <div class="card border-0 shadow-sm h-100 transition">
@@ -193,12 +218,17 @@ function getImageUrl($gambar_field) {
                             <div class="card-body">
                                 <h6 class="card-title mb-2"><?php echo htmlspecialchars($produk['nama_produk']); ?></h6>
                                 
-                                <!-- Brand dengan Logo -->
-                                <div class="d-flex align-items-center mb-2">
-                                    <?php if ($brand_logo): ?>
-                                        <img src="<?php echo htmlspecialchars($brand_logo['image_url']); ?>" 
+                                <!-- Brand dengan Logo (WITH FALLBACK) -->
+                                <div class="brand-logo-container mb-2">
+                                    <?php if ($logo_url): ?>
+                                        <img src="<?php echo htmlspecialchars($logo_url); ?>" 
                                              alt="<?php echo htmlspecialchars($produk['merek']); ?> Logo" 
-                                             style="width: 25px; height: 25px; object-fit: contain; margin-right: 8px;">
+                                             onerror="this.style.display='none';document.getElementById('<?php echo $brand_fallback_id; ?>').style.display='flex'" />
+                                    <?php endif; ?>
+                                    <?php if ($embedded_svg): ?>
+                                    <div id="<?php echo $brand_fallback_id; ?>" style="display:<?php echo ($logo_url ? 'none' : 'flex'); ?>;width:25px;height:25px;align-items:center;justify-content:center;flex-shrink:0;"><?php echo $embedded_svg; ?></div>
+                                    <?php else: ?>
+                                    <div id="<?php echo $brand_fallback_id; ?>" style="display:<?php echo ($logo_url ? 'none' : 'flex'); ?>;width:25px;height:25px;align-items:center;justify-content:center;flex-shrink:0;background:#f0f0f0;border-radius:50%;font-weight:bold;font-size:10px;color:#666;"><?php echo substr($produk['merek'], 0, 2); ?></div>
                                     <?php endif; ?>
                                     <p class="text-muted small mb-0"><?php echo htmlspecialchars($produk['merek']); ?></p>
                                 </div>
