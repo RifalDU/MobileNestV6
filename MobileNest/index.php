@@ -13,8 +13,8 @@ function getImageUrl($gambar_field) {
     
     // Check if it's a filename (local upload) or URL
     if (strpos($gambar_field, 'http') === false && strpos($gambar_field, '/') === false) {
-        // It's a filename - use UploadHandler to build URL
-        return UploadHandler::getFileUrl($gambar_field, 'produk');
+        // It's a filename - use UploadHandler to build URL from root context
+        return UploadHandler::getFileUrlFromRoot($gambar_field, 'produk');
     } else {
         // It's already a URL
         return $gambar_field;
