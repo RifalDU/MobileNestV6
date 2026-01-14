@@ -9,6 +9,8 @@ class UploadHandler {
     // Configuration
     const UPLOAD_DIR_PRODUK = 'uploads/produk/';
     const UPLOAD_DIR_PEMBAYARAN = 'uploads/pembayaran/';
+    const ADMIN_UPLOAD_DIR_PRODUK = 'admin/uploads/produk/';
+    const ADMIN_UPLOAD_DIR_PEMBAYARAN = 'admin/uploads/pembayaran/';
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
     
     // Allowed MIME types
@@ -29,7 +31,7 @@ class UploadHandler {
     public static function uploadProductImage($file, $product_id) {
         return self::uploadFile(
             $file,
-            self::UPLOAD_DIR_PRODUK,
+            self::ADMIN_UPLOAD_DIR_PRODUK,
             self::ALLOWED_PRODUK_TYPES,
             self::ALLOWED_PRODUK_EXT,
             'produk_' . $product_id
@@ -46,7 +48,7 @@ class UploadHandler {
     public static function uploadPaymentProof($file, $transaction_id) {
         return self::uploadFile(
             $file,
-            self::UPLOAD_DIR_PEMBAYARAN,
+            self::ADMIN_UPLOAD_DIR_PEMBAYARAN,
             self::ALLOWED_PEMBAYARAN_TYPES,
             self::ALLOWED_PEMBAYARAN_EXT,
             'pembayaran_' . $transaction_id
@@ -126,7 +128,7 @@ class UploadHandler {
      * @return array ['success' => bool, 'message' => string]
      */
     public static function deleteFile($filename, $type = 'produk') {
-        $upload_dir = ($type === 'pembayaran') ? self::UPLOAD_DIR_PEMBAYARAN : self::UPLOAD_DIR_PRODUK;
+        $upload_dir = ($type === 'pembayaran') ? self::ADMIN_UPLOAD_DIR_PEMBAYARAN : self::ADMIN_UPLOAD_DIR_PRODUK;
         $filepath = $upload_dir . $filename;
         
         // Security check - prevent directory traversal
@@ -149,15 +151,61 @@ class UploadHandler {
     }
     
     /**
-     * Get file URL
+     * Get file URL - Smart path resolution based on context
+     * Attempts to build correct relative path from any calling context
      * 
      * @param string $filename Filename
      * @param string $type Type of file ('produk' or 'pembayaran')
+     * @param string $from_context Optional: 'admin', 'produk', 'user' (auto-detect if not provided)
      * @return string File URL
      */
-    public static function getFileUrl($filename, $type = 'produk') {
-        $upload_dir = ($type === 'pembayaran') ? self::UPLOAD_DIR_PEMBAYARAN : self::UPLOAD_DIR_PRODUK;
+    public static function getFileUrl($filename, $type = 'produk', $from_context = null) {
+        // Determine context from call stack if not provided
+        if ($from_context === null) {
+            $backtrace = debug_backtrace();
+            $caller_file = isset($backtrace[1]['file']) ? $backtrace[1]['file'] : '';
+            
+            if (strpos($caller_file, '/admin/') !== false) {
+                $from_context = 'admin';
+            } elseif (strpos($caller_file, '/produk/') !== false) {
+                $from_context = 'produk';
+            } elseif (strpos($caller_file, '/user/') !== false) {
+                $from_context = 'user';
+            } else {
+                $from_context = 'root';
+            }
+        }
+        
+        // Build path based on context
+        if ($from_context === 'admin') {
+            // Called from admin folder
+            $upload_dir = ($type === 'pembayaran') ? self::UPLOAD_DIR_PEMBAYARAN : self::UPLOAD_DIR_PRODUK;
+        } else {
+            // Called from produk, user, or other folders - need to go up and into admin
+            $upload_dir = ($type === 'pembayaran') ? self::ADMIN_UPLOAD_DIR_PEMBAYARAN : self::ADMIN_UPLOAD_DIR_PRODUK;
+        }
+        
         return $upload_dir . $filename;
+    }
+    
+    /**
+     * Get file URL explicitly from admin context
+     * @param string $filename Filename
+     * @param string $type Type of file ('produk' or 'pembayaran')
+     * @return string File URL from admin perspective
+     */
+    public static function getFileUrlFromAdmin($filename, $type = 'produk') {
+        return self::getFileUrl($filename, $type, 'admin');
+    }
+    
+    /**
+     * Get file URL explicitly from non-admin context (e.g., produk, user pages)
+     * @param string $filename Filename
+     * @param string $type Type of file ('produk' or 'pembayaran')
+     * @return string File URL with path from non-admin folder
+     */
+    public static function getFileUrlFromProduk($filename, $type = 'produk') {
+        return self::getFileUrl($filename, $type, 'produk');
     }
 }
 ?>
