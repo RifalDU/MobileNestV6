@@ -23,13 +23,14 @@ $product = mysqli_fetch_assoc($result);
 $page_title = $product['nama_produk'];
 $brand_logo = get_brand_logo_data($product['merek']);
 
-// Build image URL dengan UploadHandler
+// Build image URL dengan Smart Path Resolution
 $image_url = '';
 if (!empty($product['gambar'])) {
     // Check if it's a filename (local upload) or URL
     if (strpos($product['gambar'], 'http') === false && strpos($product['gambar'], '/') === false) {
         // It's a filename - use UploadHandler to build URL
-        $image_url = UploadHandler::getFileUrl($product['gambar'], 'produk');
+        // Auto-detect context (dari produk folder) dan build path yang benar
+        $image_url = UploadHandler::getFileUrlFromProduk($product['gambar'], 'produk');
     } else {
         // It's already a URL
         $image_url = $product['gambar'];
@@ -253,6 +254,16 @@ include '../includes/header.php';
     .breadcrumb-custom a:hover {
         text-decoration: underline;
     }
+
+    /* Image error/loading handler */
+    .product-image-error {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 10px;
+        color: #ccc;
+    }
 </style>
 
 <div class="container py-5">
@@ -271,10 +282,12 @@ include '../includes/header.php';
             <div class="product-image-container">
                 <?php
                     if (!empty($image_url)) {
-                        echo '<img src="' . htmlspecialchars($image_url) . '" class="img-fluid" alt="' . htmlspecialchars($product['nama_produk']) . '" style="max-width: 100%; max-height: 450px; object-fit: contain;">';
+                        echo '<img src="' . htmlspecialchars($image_url) . '" class="img-fluid" alt="' . htmlspecialchars($product['nama_produk']) . '" style="max-width: 100%; max-height: 450px; object-fit: contain;" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\'">';
+                        echo '<div class="product-image-error" style="display: none;"><i class="bi bi-image" style="font-size: 5rem;"></i><p>Gambar tidak dapat dimuat</p></div>';
                     } else {
                         echo '<div class="text-center" style="width: 100%;">
                                 <i class="bi bi-phone" style="font-size: 5rem; color: #ccc;"></i>
+                                <p style="color: #ccc; margin-top: 15px;">Gambar tidak tersedia</p>
                               </div>';
                     }
                 ?>
