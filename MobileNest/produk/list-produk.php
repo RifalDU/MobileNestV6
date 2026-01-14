@@ -6,6 +6,26 @@ require_once '../includes/upload-handler.php';
 
 $page_title = "Daftar Produk";
 include '../includes/header.php';
+
+// Helper function untuk build image URL dari produk folder context
+function getImageUrl($gambar_field) {
+    if (empty($gambar_field)) {
+        return '';
+    }
+    
+    // Check if it's a filename (local upload) or URL
+    if (strpos($gambar_field, 'http') === false && strpos($gambar_field, '/') === false) {
+        // It's a filename - from produk folder, need to go up one level then into admin/uploads
+        // From /MobileNest/produk/list-produk.php:
+        //   Current: /MobileNest/produk/
+        //   Target: /MobileNest/admin/uploads/produk/
+        //   Path: ../admin/uploads/produk/
+        return '../admin/uploads/produk/' . $gambar_field;
+    } else {
+        // It's already a URL
+        return $gambar_field;
+    }
+}
 ?>
 
 <style>
@@ -151,18 +171,8 @@ include '../includes/header.php';
                     if (mysqli_num_rows($result) > 0) {
                         while ($produk = mysqli_fetch_assoc($result)) {
                             $brand_logo = get_brand_logo_data($produk['merek']);
-                            // Build image URL dengan UploadHandler - Smart path resolution
-                            $image_url = '';
-                            if (!empty($produk['gambar'])) {
-                                // Check if it's a filename (local upload) or URL
-                                if (strpos($produk['gambar'], 'http') === false && strpos($produk['gambar'], '/') === false) {
-                                    // It's a filename - use UploadHandler dengan smart path untuk folder produk
-                                    $image_url = UploadHandler::getFileUrlFromProduk($produk['gambar'], 'produk');
-                                } else {
-                                    // It's already a URL
-                                    $image_url = $produk['gambar'];
-                                }
-                            }
+                            // Build image URL dengan helper function
+                            $image_url = !empty($produk['gambar']) ? getImageUrl($produk['gambar']) : '';
                     ?>
                     <div class="product-card" data-product-id="<?php echo $produk['id_produk']; ?>">
                         <div class="card border-0 shadow-sm h-100 transition">
