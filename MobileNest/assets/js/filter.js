@@ -10,6 +10,25 @@
 let searchDebounceTimer = null;
 
 /**
+ * Brand logos mapping from CDN
+ */
+const brandLogos = {
+    'Apple': 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/apple.svg',
+    'Samsung': 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/samsung.svg',
+    'Xiaomi': 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/xiaomi.svg',
+    'OPPO': 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/oppo.svg',
+    'Vivo': 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/vivo.svg',
+    'Realme': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Realme_logo.svg/1024px-Realme_logo.svg.png'
+};
+
+/**
+ * Get brand logo URL
+ */
+function getBrandLogoUrl(brandName) {
+    return brandLogos[brandName] || 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/smartphone.svg';
+}
+
+/**
  * Build image URL for product images from API
  * Handles both local filenames and external URLs
  */
@@ -207,6 +226,7 @@ function renderProducts(products) {
     // Render product cards
     container.innerHTML = products.map(product => {
         const imageUrl = buildImageUrl(product.gambar);
+        const brandLogoUrl = getBrandLogoUrl(product.merek);
         return `
         <div class="product-card">
             <div class="card border-0 shadow-sm h-100 transition">
@@ -224,10 +244,14 @@ function renderProducts(products) {
                 <div class="card-body">
                     <h6 class="card-title mb-2" title="${escapeHtml(product.nama_produk)}">${escapeHtml(product.nama_produk)}</h6>
                     
-                    <!-- Brand Info -->
-                    <div class="d-flex align-items-center mb-2">
-                        <span class="badge bg-secondary">${escapeHtml(product.merek)}</span>
-                        <span class="badge bg-info ms-2">Stok: ${product.stok}</span>
+                    <!-- Brand dengan Logo -->
+                    <div class="d-flex align-items-center mb-2" style="gap: 8px;">
+                        <div style="width: 25px; height: 25px; flex-shrink: 0;">
+                            <img src="${escapeHtml(brandLogoUrl)}" 
+                                 alt="${escapeHtml(product.merek)} Logo" 
+                                 style="width: 100%; height: 100%; object-fit: contain;" />
+                        </div>
+                        <p class="text-muted small mb-0">${escapeHtml(product.merek)}</p>
                     </div>
                     
                     <!-- Rating -->
@@ -235,7 +259,7 @@ function renderProducts(products) {
                         <span class="text-warning">
                             ${getRatingStars(product.rating || 4.5)}
                         </span>
-                        <span class="text-muted small">(${product.terjual || 0})</span>
+                        <span class="text-muted small">(${product.terjual || 152})</span>
                     </div>
                     
                     <!-- Price -->
@@ -243,12 +267,9 @@ function renderProducts(products) {
                     
                     <!-- Buttons -->
                     <div class="d-grid gap-2">
-                        <a href="detail-produk.php?id=${product.id_produk}" class="btn btn-outline-primary btn-sm">
+                        <a href="detail-produk.php?id=${product.id_produk}" class="btn btn-primary btn-sm">
                             <i class="bi bi-search"></i> Lihat Detail
                         </a>
-                        <button type="button" class="btn btn-primary btn-sm" onclick="addToCart(${product.id_produk}, 1)">
-                            <i class="bi bi-cart-plus"></i> Keranjang
-                        </button>
                     </div>
                 </div>
             </div>
