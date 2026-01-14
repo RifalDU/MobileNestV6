@@ -1,8 +1,8 @@
 <?php
 /**
  * Brand Logo Configuration
- * Uses high-quality SVG logos from CDN (JSDelivr + Simple Icons)
- * Clean, simple, and reliable
+ * Uses high-quality SVG logos from reliable CDNs
+ * Simple Icons (JSDelivr) + Wikimedia CDN for brands not in simple-icons
  */
 
 $brand_logos = [
@@ -27,7 +27,8 @@ $brand_logos = [
         'alt' => 'Vivo Logo'
     ],
     'Realme' => [
-        'image_url' => 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/realme.svg',
+        // Using Wikimedia Commons - high quality Realme logo
+        'image_url' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Realme_logo.svg/1024px-Realme_logo.svg.png',
         'alt' => 'Realme Logo'
     ]
 ];
