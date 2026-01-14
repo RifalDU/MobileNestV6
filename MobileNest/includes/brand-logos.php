@@ -5,10 +5,10 @@
  * With embedded SVG fallback for robustness
  */
 
-// Embedded SVG logos (these will ALWAYS work)
+// Embedded SVG logos (these will ALWAYS work) - LARGER and BOLDER
 $embedded_svgs = [
-    'Realme' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" preserveAspectRatio="xMidYMid meet"><defs><style>.realme-circle{fill:none;stroke:#00a699;stroke-width:3}.realme-text{font-size:32px;font-weight:700;fill:#00a699;font-family:Arial,sans-serif;letter-spacing:-1px}</style></defs><circle class="realme-circle" cx="50" cy="50" r="42"/><text x="50" y="62" text-anchor="middle" class="realme-text">Re</text></svg>',
-    'OPPO' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" preserveAspectRatio="xMidYMid meet"><defs><style>.oppo-circle{fill:none;stroke:#1f1f1f;stroke-width:3}.oppo-text{font-size:36px;font-weight:700;fill:#1f1f1f;font-family:Arial,sans-serif}</style></defs><circle class="oppo-circle" cx="50" cy="50" r="42"/><text x="50" y="62" text-anchor="middle" class="oppo-text">OP</text></svg>',
+    'Realme' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet"><defs><style>.realme-text{font-size:80px;font-weight:900;fill:#00a699;font-family:Arial,Helvetica,sans-serif;letter-spacing:-5px}</style></defs><text x="100" y="150" text-anchor="middle" class="realme-text">Re</text></svg>',
+    'OPPO' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet"><defs><style>.oppo-text{font-size:80px;font-weight:900;fill:#1f1f1f;font-family:Arial,Helvetica,sans-serif;letter-spacing:-5px}</style></defs><text x="100" y="150" text-anchor="middle" class="oppo-text">OP</text></svg>',
 ];
 
 $brand_logos = [
