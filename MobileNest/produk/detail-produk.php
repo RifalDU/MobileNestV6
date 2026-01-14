@@ -23,19 +23,28 @@ $product = mysqli_fetch_assoc($result);
 $page_title = $product['nama_produk'];
 $brand_logo = get_brand_logo_data($product['merek']);
 
-// Build image URL dengan Smart Path Resolution
-$image_url = '';
-if (!empty($product['gambar'])) {
+// Helper function untuk build image URL dari produk folder context
+function getImageUrl($gambar_field) {
+    if (empty($gambar_field)) {
+        return '';
+    }
+    
     // Check if it's a filename (local upload) or URL
-    if (strpos($product['gambar'], 'http') === false && strpos($product['gambar'], '/') === false) {
-        // It's a filename - use UploadHandler to build URL
-        // Auto-detect context (dari produk folder) dan build path yang benar
-        $image_url = UploadHandler::getFileUrlFromProduk($product['gambar'], 'produk');
+    if (strpos($gambar_field, 'http') === false && strpos($gambar_field, '/') === false) {
+        // It's a filename - from produk folder, need to go up one level then into admin/uploads
+        // From /MobileNest/produk/detail-produk.php:
+        //   Current: /MobileNest/produk/
+        //   Target: /MobileNest/admin/uploads/produk/
+        //   Path: ../admin/uploads/produk/
+        return '../admin/uploads/produk/' . $gambar_field;
     } else {
         // It's already a URL
-        $image_url = $product['gambar'];
+        return $gambar_field;
     }
 }
+
+// Build image URL
+$image_url = !empty($product['gambar']) ? getImageUrl($product['gambar']) : '';
 
 include '../includes/header.php';
 ?>
