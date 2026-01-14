@@ -5,7 +5,12 @@
  * 
  * Updated: Jan 14, 2026
  * - Apple, Samsung, Xiaomi, OPPO, Vivo: Using CDN (Simple Icons)
- * - Realme: Using alternative CDN (Wikimedia Commons) - more reliable
+ * - Realme: Using local file (assets/images/realme-logo.jpg)
+ * 
+ * Path Handling:
+ * - brand-logos.php uses ../assets/images/ relative path
+ * - index.php (root): adjusts to assets/images/
+ * - list-produk.php (subdirectory): keeps ../assets/images/
  */
 
 $brand_logos = [
@@ -35,12 +40,13 @@ $brand_logos = [
         'type' => 'cdn'
     ],
     'Realme' => [
-        // Using Wikimedia Commons - high quality Realme logo
-        // More reliable than other CDNs for brand logos
-        'image_url' => 'https://upload.wikimedia.org/wikipedia/en/9/92/Realme_logo.png',
+        // Local file - manually managed
+        // Path: /MobileNest/assets/images/realme-logo.jpg
+        // Must be uploaded manually to assets/images folder
+        'image_url' => '../assets/images/realme-logo.jpg',
         'alt' => 'Realme Logo',
-        'type' => 'cdn',
-        'note' => 'Wikimedia Commons CDN - stable and reliable'
+        'type' => 'local',
+        'note' => 'Local file at assets/images/realme-logo.jpg'
     ]
 ];
 
