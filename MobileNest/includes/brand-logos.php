@@ -5,9 +5,9 @@
  * With embedded SVG fallback for robustness
  */
 
-// Embedded SVG logos (these will ALWAYS work) - LARGER and BOLDER
+// Embedded SVG logos (these will ALWAYS work) - LARGER and BOLDER with BLACK COLOR
 $embedded_svgs = [
-    'Realme' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet"><defs><style>.realme-text{font-size:80px;font-weight:900;fill:#00a699;font-family:Arial,Helvetica,sans-serif;letter-spacing:-5px}</style></defs><text x="100" y="150" text-anchor="middle" class="realme-text">Re</text></svg>',
+    'Realme' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet"><defs><style>.realme-text{font-size:80px;font-weight:900;fill:#1f1f1f;font-family:Arial,Helvetica,sans-serif;letter-spacing:-5px}</style></defs><text x="100" y="150" text-anchor="middle" class="realme-text">Re</text></svg>',
     'OPPO' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet"><defs><style>.oppo-text{font-size:80px;font-weight:900;fill:#1f1f1f;font-family:Arial,Helvetica,sans-serif;letter-spacing:-5px}</style></defs><text x="100" y="150" text-anchor="middle" class="oppo-text">OP</text></svg>',
 ];
 
