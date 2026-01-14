@@ -74,19 +74,6 @@ function getImageUrl($gambar_field) {
     object-fit: contain;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
-.category-logo .logo-fallback {
-    display: none;
-    width: 100%;
-    height: 100%;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
-    color: #666;
-}
-.category-logo .logo-fallback svg {
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-}
 .product-badge {
     position: absolute;
     top: 10px;
@@ -177,9 +164,7 @@ function getImageUrl($gambar_field) {
             $brands = ['Samsung', 'Xiaomi', 'Apple', 'OPPO', 'Vivo', 'Realme'];
             foreach($brands as $brand):
                 $logo_url = get_brand_logo_url($brand);
-                $embedded_svg = get_brand_embedded_svg($brand);
                 $brand_safe = htmlspecialchars($brand);
-                $fallback_id = 'fallback-' . strtolower(str_replace(' ', '-', $brand));
             ?>
             <div class="col-6 col-md-4 col-lg-2">
                 <a href="<?php echo SITE_URL; ?>/produk/list-produk.php?brand=<?php echo urlencode($brand); ?>" class="category-card">
@@ -187,13 +172,7 @@ function getImageUrl($gambar_field) {
                         <img src="<?php echo htmlspecialchars($logo_url); ?>" 
                              alt="<?php echo $brand_safe; ?> Logo" 
                              loading="lazy" 
-                             style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));"
-                             onerror="this.style.display='none';document.getElementById('<?php echo $fallback_id; ?>').style.display='flex'">
-                        <?php if ($embedded_svg): ?>
-                        <div id="<?php echo $fallback_id; ?>" class="logo-fallback" style="color:#1f1f1f;"><?php echo $embedded_svg; ?></div>
-                        <?php else: ?>
-                        <div id="<?php echo $fallback_id; ?>" class="logo-fallback" style="background:#f0f0f0;border-radius:50%;color:#666;"><?php echo substr($brand, 0, 2); ?></div>
-                        <?php endif; ?>
+                             style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
                     </div>
                     <h5><?php echo $brand_safe; ?></h5>
                 </a>
