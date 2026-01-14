@@ -34,20 +34,22 @@ $brand_logos = [
         'alt' => 'Vivo Logo'
     ],
     'Realme' => [
-        // Multiple CDN sources - will try in order, falls back to embedded SVG
+        // Multiple sources - prioritas lokal/CDN yang reliable
         'image_urls' => [
-            // Priority 1: simple-icons (most reliable)
-            'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/realme.svg',
-            // Priority 2: wikimedia commons (always available, high quality)
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Realme_logo.svg/1024px-Realme_logo.svg.png',
-            // Priority 3: alternative CDN
-            'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/realme.svg',
-            // Priority 4: local fallback (jika di-download manual)
+            // Priority 1: Local file (jika sudah di-download)
             'assets/logos/realme-logo.svg',
+            'assets/logos/realme-logo.png',
+            // Priority 2: CDN JSdelivr (simple-icons - most reliable)
+            'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/realme.svg',
+            // Priority 3: GitHub raw (SVG)
+            'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/realme.svg',
+            // Priority 4: Wikimedia (PNG with transparency)
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Realme_logo.svg/1024px-Realme_logo.svg.png',
         ],
-        'image_url' => 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/realme.svg', // Primary
+        // Default/primary URL (akan di-cek pertama)
+        'image_url' => 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/realme.svg',
         'alt' => 'Realme Logo',
-        'has_embedded' => true // Has SVG fallback
+        'has_embedded' => true
     ]
 ];
 
