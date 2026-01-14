@@ -1,13 +1,11 @@
 <?php
 /**
  * Brand Logo Configuration
- * Uses high-quality SVG logos from reliable CDNs
- * Simple Icons (JSDelivr) + Wikimedia CDN for brands not in simple-icons
+ * Uses high-quality logos from reliable sources
  * 
  * Updated: Jan 14, 2026
- * - Realme: Changed from local file to Wikimedia CDN (more reliable)
- * - All logos now use CDN sources for consistency
- * - Added fallback mechanisms for broken images
+ * - Apple, Samsung, Xiaomi, OPPO, Vivo: Using CDN (Simple Icons)
+ * - Realme: Using local file (assets/images/realme-logo.jpg) - manually managed
  */
 
 $brand_logos = [
@@ -37,12 +35,13 @@ $brand_logos = [
         'type' => 'cdn'
     ],
     'Realme' => [
-        // Updated: Using Simple Icons CDN (more reliable than local file)
-        // Previous path was: '../uploads/logo/realme-logo.png' (local file)
-        'image_url' => 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/realme.svg',
+        // Changed: Using local file instead of CDN (Jan 14, 2026)
+        // Path: /MobileNest/assets/images/realme-logo.jpg
+        // This is manually managed and doesn't depend on external CDN
+        'image_url' => '../assets/images/realme-logo.jpg',
         'alt' => 'Realme Logo',
-        'type' => 'cdn',
-        'note' => 'Updated to CDN on Jan 14, 2026'
+        'type' => 'local',
+        'note' => 'Local file at assets/images/realme-logo.jpg'
     ]
 ];
 
@@ -224,6 +223,17 @@ function get_brand_logo_with_visual_fallback($brand_name, $fallback_color = '#f0
 function get_brand_logo_type($brand_name) {
     $data = get_brand_logo_data($brand_name);
     return $data ? ($data['type'] ?? 'unknown') : null;
+}
+
+/**
+ * Get logo source info for debugging
+ * Returns the complete logo configuration
+ * 
+ * @param string $brand_name The brand name
+ * @return array|null Complete logo data or null
+ */
+function get_brand_logo_info($brand_name) {
+    return get_brand_logo_data($brand_name);
 }
 
 ?>
