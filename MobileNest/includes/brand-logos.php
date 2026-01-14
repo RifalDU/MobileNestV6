@@ -34,13 +34,22 @@ $brand_logos = [
 ];
 
 /**
- * Get brand logo URL
+ * Get brand logo URL with case-insensitive lookup
+ * Supports: Apple, apple, APPLE, aPPle, etc.
  */
 function get_brand_logo_url($brand_name) {
     global $brand_logos;
     
+    // First try exact match
     if (isset($brand_logos[$brand_name])) {
         return $brand_logos[$brand_name]['image_url'];
+    }
+    
+    // Then try case-insensitive match
+    foreach ($brand_logos as $key => $data) {
+        if (strtolower($key) === strtolower($brand_name)) {
+            return $data['image_url'];
+        }
     }
     
     // Default smartphone icon jika brand tidak ditemukan
@@ -48,13 +57,21 @@ function get_brand_logo_url($brand_name) {
 }
 
 /**
- * Get brand logo alt text
+ * Get brand logo alt text with case-insensitive lookup
  */
 function get_brand_logo_alt($brand_name) {
     global $brand_logos;
     
+    // First try exact match
     if (isset($brand_logos[$brand_name])) {
         return $brand_logos[$brand_name]['alt'];
+    }
+    
+    // Then try case-insensitive match
+    foreach ($brand_logos as $key => $data) {
+        if (strtolower($key) === strtolower($brand_name)) {
+            return $data['alt'];
+        }
     }
     
     return 'Brand Logo';
@@ -69,11 +86,24 @@ function get_all_brands() {
 }
 
 /**
- * Get brand logo data
+ * Get brand logo data with case-insensitive lookup
  */
 function get_brand_logo_data($brand_name) {
     global $brand_logos;
-    return isset($brand_logos[$brand_name]) ? $brand_logos[$brand_name] : null;
+    
+    // First try exact match
+    if (isset($brand_logos[$brand_name])) {
+        return $brand_logos[$brand_name];
+    }
+    
+    // Then try case-insensitive match
+    foreach ($brand_logos as $key => $data) {
+        if (strtolower($key) === strtolower($brand_name)) {
+            return $data;
+        }
+    }
+    
+    return null;
 }
 
 /**
