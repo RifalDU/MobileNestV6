@@ -151,13 +151,13 @@ include '../includes/header.php';
                     if (mysqli_num_rows($result) > 0) {
                         while ($produk = mysqli_fetch_assoc($result)) {
                             $brand_logo = get_brand_logo_data($produk['merek']);
-                            // Build image URL dengan UploadHandler
+                            // Build image URL dengan UploadHandler - Smart path resolution
                             $image_url = '';
                             if (!empty($produk['gambar'])) {
                                 // Check if it's a filename (local upload) or URL
                                 if (strpos($produk['gambar'], 'http') === false && strpos($produk['gambar'], '/') === false) {
-                                    // It's a filename - use UploadHandler to build URL
-                                    $image_url = UploadHandler::getFileUrl($produk['gambar'], 'produk');
+                                    // It's a filename - use UploadHandler dengan smart path untuk folder produk
+                                    $image_url = UploadHandler::getFileUrlFromProduk($produk['gambar'], 'produk');
                                 } else {
                                     // It's already a URL
                                     $image_url = $produk['gambar'];
@@ -171,7 +171,8 @@ include '../includes/header.php';
                                 <?php if (!empty($image_url)): ?>
                                     <img src="<?php echo htmlspecialchars($image_url); ?>" 
                                          alt="<?php echo htmlspecialchars($produk['nama_produk']); ?>" 
-                                         style="width: 100%; height: 100%; object-fit: cover;" />
+                                         style="width: 100%; height: 100%; object-fit: cover;" 
+                                         onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\"bi bi-phone\" style=\"font-size: 3rem; color: #ccc;\"></i>';" />
                                 <?php else: ?>
                                     <i class="bi bi-phone" style="font-size: 3rem; color: #ccc;"></i>
                                 <?php endif; ?>
