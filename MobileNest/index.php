@@ -74,6 +74,20 @@ function getImageUrl($gambar_field) {
     object-fit: contain;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
+/* Fallback div styling for logo display */
+.logo-fallback {
+    width: 60px;
+    height: 60px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #666;
+    font-size: 12px;
+    flex-shrink: 0;
+}
 .product-badge {
     position: absolute;
     top: 10px;
@@ -146,7 +160,7 @@ function getImageUrl($gambar_field) {
                 </div>
             </div>
             <div class="col-lg-5 text-center mt-5 mt-lg-0">
-                <img src="<?php echo SITE_URL; ?>/assets/images/logo.jpg" alt="MobileNest" class="img-fluid" style="max-height: 350px; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));">
+                <img src="<?php echo SITE_URL; ?>/assets/images/logo.jpg" alt="MobileNest" class="img-fluid" style="max-height: 350px; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3)); border-radius: 15px;" onerror="this.src='<?php echo SITE_URL; ?>/assets/images/LogoMobileNest.png';">
             </div>
         </div>
     </div>
@@ -164,15 +178,27 @@ function getImageUrl($gambar_field) {
             $brands = ['Samsung', 'Xiaomi', 'Apple', 'OPPO', 'Vivo', 'Realme'];
             foreach($brands as $brand):
                 $logo_url = get_brand_logo_url($brand);
+                $logo_type = get_brand_logo_type($brand);
                 $brand_safe = htmlspecialchars($brand);
+                $brand_id = strtolower(str_replace(' ', '-', $brand));
+                $fallback_id = 'brand-fallback-' . $brand_id . '-' . uniqid();
+                $initials = substr($brand, 0, 2);
             ?>
             <div class="col-6 col-md-4 col-lg-2">
                 <a href="<?php echo SITE_URL; ?>/produk/list-produk.php?brand=<?php echo urlencode($brand); ?>" class="category-card">
                     <div class="category-logo">
-                        <img src="<?php echo htmlspecialchars($logo_url); ?>" 
+                        <img id="img-<?php echo htmlspecialchars($fallback_id); ?>" 
+                             src="<?php echo htmlspecialchars($logo_url); ?>" 
                              alt="<?php echo $brand_safe; ?> Logo" 
                              loading="lazy" 
-                             style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
+                             style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); display: block;" 
+                             onerror="this.style.display='none'; document.getElementById('<?php echo htmlspecialchars($fallback_id); ?>').style.display='flex';" />
+                        <!-- Fallback: Brand initials in circle -->
+                        <div id="<?php echo htmlspecialchars($fallback_id); ?>" 
+                             class="logo-fallback" 
+                             style="width: 60px; height: 60px; border-radius: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                            <?php echo htmlspecialchars($initials); ?>
+                        </div>
                     </div>
                     <h5><?php echo $brand_safe; ?></h5>
                 </a>
@@ -203,6 +229,7 @@ function getImageUrl($gambar_field) {
                 while ($row = mysqli_fetch_assoc($result)) {
                     $img_src = !empty($row['gambar']) ? getImageUrl($row['gambar']) : '';
                     $badge_index = $index % 3;
+                    $product_fallback_id = 'product-img-' . $row['id_produk'];
             ?>
             <div class="col-6 col-md-4 col-lg-3">
                 <div class="card product-card h-100">
@@ -210,7 +237,11 @@ function getImageUrl($gambar_field) {
                     <span class="product-badge <?php echo $badge_classes[$badge_index]; ?>"><?php echo $badges[$badge_index]; ?></span>
                     <?php endif; ?>
                     <?php if (!empty($img_src)): ?>
-                    <img src="<?php echo htmlspecialchars($img_src); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($row['nama_produk']); ?>">
+                    <img id="<?php echo htmlspecialchars($product_fallback_id); ?>" 
+                         src="<?php echo htmlspecialchars($img_src); ?>" 
+                         class="card-img-top" 
+                         alt="<?php echo htmlspecialchars($row['nama_produk']); ?>"
+                         onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'card-img-top d-flex align-items-center justify-content-center bg-light\' style=\'height: 220px;\'>❌ Gambar tidak tersedia</div>';" />
                     <?php else: ?>
                     <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 220px;">
                         <i class="bi bi-phone" style="font-size: 3rem; color: #ccc;"></i>
