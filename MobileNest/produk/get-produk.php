@@ -1,121 +1,118 @@
 <?php
+/**
+ * API Endpoint untuk fetch produk
+ * GET /produk/get-produk.php
+ * 
+ * Parameters:
+ *   - filter (optional): terbaru, bestseller, price_low, price_high
+ *   - limit (optional): jumlah produk yang di-return
+ *   - offset (optional): pagination offset
+ *   - search (optional): pencarian produk berdasarkan nama
+ * 
+ * Returns:
+ *   JSON array dengan data produk
+ */
+
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+
 require_once '../config.php';
+require_once '../includes/upload-handler.php';
 
-error_log('===== get-produk.php START =====' . date('Y-m-d H:i:s'));
+// Get parameters
+$filter = isset($_GET['filter']) ? $_GET['filter'] : 'terbaru';
+$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+$offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
-try {
-    // Get filter parameters
-    $brand = isset($_GET['brand']) ? $_GET['brand'] : '';
-    $min_price = isset($_GET['min_price']) ? (int)$_GET['min_price'] : 0;
-    $max_price = isset($_GET['max_price']) ? (int)$_GET['max_price'] : 999999999;
-    $search = isset($_GET['search']) ? $_GET['search'] : '';
-    $sort = isset($_GET['sort']) ? $_GET['sort'] : 'terbaru';
+// Sanitize inputs
+$limit = ($limit > 100) ? 100 : $limit; // Max 100 per request
+$limit = ($limit < 1) ? 10 : $limit;
+$offset = ($offset < 0) ? 0 : $offset;
 
-    error_log('Query params - brand: ' . $brand . ', price: ' . $min_price . '-' . $max_price . ', search: ' . $search . ', sort: ' . $sort);
+// Build WHERE clause
+$where_clauses = ["produk.status_produk = 'Tersedia'"];
 
-    // Build WHERE clause
-    $where_conditions = ["status_produk = 'Tersedia'"];
+if (!empty($search)) {
+    $search_safe = mysqli_real_escape_string($conn, $search);
+    $where_clauses[] = "(produk.nama_produk LIKE '%$search_safe%' OR produk.deskripsi LIKE '%$search_safe%')";
+}
 
-    if (!empty($brand)) {
-        $brands_array = explode(',', $brand);
-        $brands_safe = array_map(function($b) { 
-            global $conn;
-            return "'" . $conn->real_escape_string(trim($b)) . "'";
-        }, $brands_array);
-        $where_conditions[] = "merek IN (" . implode(',', $brands_safe) . ")";
-    }
+$where = implode(' AND ', $where_clauses);
 
-    if ($min_price > 0 || $max_price < 999999999) {
-        $where_conditions[] = "harga >= $min_price AND harga <= $max_price";
-    }
+// Build ORDER BY clause
+$order_by = "produk.tanggal_ditambahkan DESC"; // default
 
-    if (!empty($search)) {
-        $search_safe = $conn->real_escape_string($search);
-        $where_conditions[] = "(nama_produk LIKE '%$search_safe%' OR merek LIKE '%$search_safe%')";
-    }
+switch ($filter) {
+    case 'bestseller':
+        $order_by = "produk.terjual DESC";
+        break;
+    case 'price_low':
+        $order_by = "produk.harga ASC";
+        break;
+    case 'price_high':
+        $order_by = "produk.harga DESC";
+        break;
+    case 'rating':
+        $order_by = "produk.rating DESC";
+        break;
+    case 'terbaru':
+    default:
+        $order_by = "produk.tanggal_ditambahkan DESC";
+        break;
+}
 
-    $where_clause = implode(' AND ', $where_conditions);
-    
-    error_log('WHERE clause: ' . $where_clause);
+// Execute query
+$sql = "SELECT id_produk, nama_produk, merek, deskripsi, harga, stok, gambar, kategori, rating, terjual 
+        FROM produk 
+        WHERE $where 
+        ORDER BY $order_by 
+        LIMIT $limit OFFSET $offset";
 
-    // Build ORDER BY clause - simple, without optional columns
-    $order_by = "id_produk DESC"; // Default simple sort
+$result = mysqli_query($conn, $sql);
 
-    switch($sort) {
-        case 'harga_rendah':
-            $order_by = "harga ASC";
-            break;
-        case 'harga_tinggi':
-            $order_by = "harga DESC";
-            break;
-        case 'populer':
-            // If terjual column exists, use it; otherwise sort by id
-            $order_by = "id_produk DESC";
-            break;
-        case 'terbaru':
-        default:
-            // If tanggal_ditambahkan exists, use it; otherwise use id
-            $order_by = "id_produk DESC";
-    }
-
-    error_log('ORDER BY: ' . $order_by);
-
-    // SELECT only columns that definitely exist
-    // Safe columns: id_produk, nama_produk, merek, harga, stok, status_produk, kategori, gambar
-    $sql = "SELECT id_produk, nama_produk, merek, harga, stok, kategori, status_produk, gambar 
-            FROM produk 
-            WHERE $where_clause 
-            ORDER BY $order_by";
-
-    error_log('SQL Query: ' . $sql);
-
-    $result = mysqli_query($conn, $sql);
-
-    if (!$result) {
-        $error_msg = 'SQL Error: ' . mysqli_error($conn);
-        error_log($error_msg);
-        http_response_code(500);
-        echo json_encode([
-            'error' => 'Database error',
-            'details' => $error_msg
-        ]);
-        exit;
-    }
-
-    $products = [];
-    $row_count = 0;
-    
-    while ($row = mysqli_fetch_assoc($result)) {
-        $row_count++;
-        // Convert to proper types
-        $row['id_produk'] = (int)$row['id_produk'];
-        $row['harga'] = (int)$row['harga'];
-        $row['stok'] = (int)$row['stok'];
-        
-        // Add optional fields with defaults
-        $row['terjual'] = 0;
-        $row['rating'] = 4.5;
-        
-        $products[] = $row;
-    }
-
-    error_log('Products found: ' . count($products) . ' rows processed: ' . $row_count);
-    error_log('===== get-produk.php END (SUCCESS) =====' . date('Y-m-d H:i:s'));
-
-    // Return successful response
-    http_response_code(200);
-    echo json_encode($products);
-
-} catch (Exception $e) {
-    error_log('Exception in get-produk.php: ' . $e->getMessage());
-    error_log('Stack trace: ' . $e->getTraceAsString());
+if (!$result) {
     http_response_code(500);
     echo json_encode([
-        'error' => 'Server error',
-        'message' => $e->getMessage()
+        'success' => false,
+        'message' => 'Database query error'
     ]);
+    exit;
 }
+
+// Build response
+$produk_list = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    // Build image URL dengan smart path resolution
+    $image_url = '';
+    if (!empty($row['gambar'])) {
+        if (strpos($row['gambar'], 'http') === false && strpos($row['gambar'], '/') === false) {
+            // It's a filename - use UploadHandler dengan smart path untuk folder produk
+            $image_url = UploadHandler::getFileUrlFromProduk($row['gambar'], 'produk');
+        } else {
+            // It's already a URL
+            $image_url = $row['gambar'];
+        }
+    }
+    
+    $produk_list[] = [
+        'id_produk' => (int)$row['id_produk'],
+        'nama_produk' => htmlspecialchars($row['nama_produk']),
+        'merek' => htmlspecialchars($row['merek']),
+        'deskripsi' => htmlspecialchars(substr($row['deskripsi'], 0, 100)) . '...',
+        'harga' => (float)$row['harga'],
+        'stok' => (int)$row['stok'],
+        'gambar' => htmlspecialchars($image_url),
+        'kategori' => htmlspecialchars($row['kategori']),
+        'rating' => (float)$row['rating'],
+        'terjual' => (int)$row['terjual']
+    ];
+}
+
+http_response_code(200);
+echo json_encode([
+    'success' => true,
+    'total' => count($produk_list),
+    'filter' => $filter,
+    'data' => $produk_list
+]);
 ?>
