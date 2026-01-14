@@ -152,11 +152,11 @@ class UploadHandler {
     
     /**
      * Get file URL - Smart path resolution based on context
-     * Attempts to build correct relative path from any calling context
+     * Browser-friendly relative paths that resolve correctly from any calling context
      * 
      * @param string $filename Filename
      * @param string $type Type of file ('produk' or 'pembayaran')
-     * @param string $from_context Optional: 'admin', 'produk', 'user' (auto-detect if not provided)
+     * @param string $from_context Optional: 'admin', 'produk', 'user', 'root' (auto-detect if not provided)
      * @return string File URL
      */
     public static function getFileUrl($filename, $type = 'produk', $from_context = null) {
@@ -177,12 +177,18 @@ class UploadHandler {
         }
         
         // Build path based on context
+        // Browser resolves relative paths from current page location
         if ($from_context === 'admin') {
-            // Called from admin folder
+            // From /admin/ folder: sibling uploads folder
+            // Path: /MobileNest/admin/ + uploads/produk/ = /MobileNest/admin/uploads/produk/
             $upload_dir = ($type === 'pembayaran') ? self::UPLOAD_DIR_PEMBAYARAN : self::UPLOAD_DIR_PRODUK;
         } else {
-            // Called from produk, user, or other folders - need to go up and into admin
-            $upload_dir = ($type === 'pembayaran') ? self::ADMIN_UPLOAD_DIR_PEMBAYARAN : self::ADMIN_UPLOAD_DIR_PRODUK;
+            // From /produk/, /user/, or root: need to go up one level to access admin/uploads
+            // From /MobileNest/produk/list-produk.php:
+            //   Need: /MobileNest/admin/uploads/produk/
+            //   Path: ../admin/uploads/produk/
+            $base_dir = ($type === 'pembayaran') ? 'admin/uploads/pembayaran/' : 'admin/uploads/produk/';
+            $upload_dir = '../' . $base_dir;
         }
         
         return $upload_dir . $filename;
@@ -202,10 +208,20 @@ class UploadHandler {
      * Get file URL explicitly from non-admin context (e.g., produk, user pages)
      * @param string $filename Filename
      * @param string $type Type of file ('produk' or 'pembayaran')
-     * @return string File URL with path from non-admin folder
+     * @return string File URL with ../admin/ prefix for correct browser resolution
      */
     public static function getFileUrlFromProduk($filename, $type = 'produk') {
         return self::getFileUrl($filename, $type, 'produk');
+    }
+    
+    /**
+     * Get file URL for root context (index.php, etc.)
+     * @param string $filename Filename
+     * @param string $type Type of file ('produk' or 'pembayaran')
+     * @return string File URL
+     */
+    public static function getFileUrlFromRoot($filename, $type = 'produk') {
+        return self::getFileUrl($filename, $type, 'root');
     }
 }
 ?>
