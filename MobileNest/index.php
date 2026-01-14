@@ -21,6 +21,16 @@ function getImageUrl($gambar_field) {
         return $gambar_field;
     }
 }
+
+// Helper function untuk adjust path dari includes ke root context
+function adjustBrandLogoPath($logo_url) {
+    // Jika path dimulai dengan ../ dan di context index.php (root)
+    // Ubah ../ menjadi tidak ada (karena sudah di root)
+    if (strpos($logo_url, '../') === 0) {
+        return substr($logo_url, 3); // Remove "../"
+    }
+    return $logo_url;
+}
 ?>
 
 <style>
@@ -178,6 +188,8 @@ function getImageUrl($gambar_field) {
             $brands = ['Samsung', 'Xiaomi', 'Apple', 'OPPO', 'Vivo', 'Realme'];
             foreach($brands as $brand):
                 $logo_url = get_brand_logo_url($brand);
+                // Adjust path untuk context index.php (root level)
+                $logo_url = adjustBrandLogoPath($logo_url);
                 $logo_type = get_brand_logo_type($brand);
                 $brand_safe = htmlspecialchars($brand);
                 $brand_id = strtolower(str_replace(' ', '-', $brand));
