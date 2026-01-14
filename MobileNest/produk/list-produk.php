@@ -74,26 +74,21 @@ function getImageUrl($gambar_field) {
                                 $available_brands = get_all_brands();
                                 foreach ($available_brands as $brand):
                                     $logo_url = get_brand_logo_url($brand);
-                                    $embedded_svg = get_brand_embedded_svg($brand);
-                                    $fallback_id = 'brand-fallback-' . strtolower(str_replace(' ', '-', $brand));
+                                    $brand_safe = htmlspecialchars($brand);
                                 ?>
                                 <div class="form-check d-flex align-items-center mb-2 p-2" style="cursor: pointer;">
-                                    <div style="width: 28px; height: 28px; margin-right: 8px; flex-shrink: 0; position: relative;">
+                                    <div style="width: 28px; height: 28px; margin-right: 8px; flex-shrink: 0;">
                                         <img src="<?php echo htmlspecialchars($logo_url); ?>" 
-                                             alt="<?php echo htmlspecialchars($brand); ?> Logo" 
-                                             style="width: 100%; height: 100%; object-fit: contain;"
-                                             onerror="this.style.display='none'; document.getElementById('<?php echo $fallback_id; ?>').style.display='flex';" />
-                                        <?php if ($embedded_svg): ?>
-                                        <div id="<?php echo $fallback_id; ?>" style="display:none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center;"><?php echo $embedded_svg; ?></div>
-                                        <?php endif; ?>
+                                             alt="<?php echo $brand_safe; ?> Logo" 
+                                             style="width: 100%; height: 100%; object-fit: contain;" />
                                     </div>
                                     <div class="form-check" style="flex-grow: 1;">
                                         <input class="form-check-input brand-checkbox" type="checkbox" 
-                                               value="<?php echo htmlspecialchars($brand); ?>" 
+                                               value="<?php echo $brand_safe; ?>" 
                                                id="merek_<?php echo strtolower(str_replace(' ', '_', $brand)); ?>" />
                                         <label class="form-check-label small" 
                                                for="merek_<?php echo strtolower(str_replace(' ', '_', $brand)); ?>">
-                                            <?php echo htmlspecialchars($brand); ?>
+                                            <?php echo $brand_safe; ?>
                                         </label>
                                     </div>
                                 </div>
@@ -165,8 +160,6 @@ function getImageUrl($gambar_field) {
                         while ($produk = mysqli_fetch_assoc($result)) {
                             $image_url = !empty($produk['gambar']) ? getImageUrl($produk['gambar']) : '';
                             $logo_url = get_brand_logo_url($produk['merek']);
-                            $embedded_svg = get_brand_embedded_svg($produk['merek']);
-                            $brand_fallback_id = 'product-brand-fallback-' . $produk['id_produk'];
                     ?>
                     <div class="product-card" data-product-id="<?php echo $produk['id_produk']; ?>">
                         <div class="card border-0 shadow-sm h-100 transition">
@@ -175,11 +168,7 @@ function getImageUrl($gambar_field) {
                                 <?php if (!empty($image_url)): ?>
                                     <img src="<?php echo htmlspecialchars($image_url); ?>" 
                                          alt="<?php echo htmlspecialchars($produk['nama_produk']); ?>" 
-                                         style="width: 100%; height: 100%; object-fit: cover;" 
-                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                                    <div style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center;">
-                                        <i class="bi bi-phone" style="font-size: 3rem; color: #ccc;"></i>
-                                    </div>
+                                         style="width: 100%; height: 100%; object-fit: cover;" />
                                 <?php else: ?>
                                     <i class="bi bi-phone" style="font-size: 3rem; color: #ccc;"></i>
                                 <?php endif; ?>
@@ -192,14 +181,10 @@ function getImageUrl($gambar_field) {
                                 
                                 <!-- Brand dengan Logo -->
                                 <div class="d-flex align-items-center mb-2" style="gap: 8px;">
-                                    <div style="width: 25px; height: 25px; flex-shrink: 0; position: relative;">
+                                    <div style="width: 25px; height: 25px; flex-shrink: 0;">
                                         <img src="<?php echo htmlspecialchars($logo_url); ?>" 
                                              alt="<?php echo htmlspecialchars($produk['merek']); ?> Logo" 
-                                             style="width: 100%; height: 100%; object-fit: contain;"
-                                             onerror="this.style.display='none'; document.getElementById('<?php echo $brand_fallback_id; ?>').style.display='flex';" />
-                                        <?php if ($embedded_svg): ?>
-                                        <div id="<?php echo $brand_fallback_id; ?>" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center;"><?php echo $embedded_svg; ?></div>
-                                        <?php endif; ?>
+                                             style="width: 100%; height: 100%; object-fit: contain;" />
                                     </div>
                                     <p class="text-muted small mb-0"><?php echo htmlspecialchars($produk['merek']); ?></p>
                                 </div>
