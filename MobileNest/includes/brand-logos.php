@@ -34,10 +34,20 @@ $brand_logos = [
         'alt' => 'Vivo Logo'
     ],
     'Realme' => [
-        // Primary: Use simple-icons SVG which is cleaner (no background)
-        'image_url' => 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/realme.svg',
+        // Multiple CDN sources - will try in order, falls back to embedded SVG
+        'image_urls' => [
+            // Priority 1: simple-icons (most reliable)
+            'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/realme.svg',
+            // Priority 2: wikimedia commons (always available, high quality)
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Realme_logo.svg/1024px-Realme_logo.svg.png',
+            // Priority 3: alternative CDN
+            'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/realme.svg',
+            // Priority 4: local fallback (jika di-download manual)
+            'assets/logos/realme-logo.svg',
+        ],
+        'image_url' => 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/realme.svg', // Primary
         'alt' => 'Realme Logo',
-        'has_embedded' => true
+        'has_embedded' => true // Has SVG fallback
     ]
 ];
 
@@ -52,6 +62,24 @@ function get_brand_logo_url($brand_name) {
     }
     
     return 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/smartphone.svg';
+}
+
+/**
+ * Get all image URLs for a brand (for fallback chain)
+ */
+function get_brand_image_urls($brand_name) {
+    global $brand_logos;
+    
+    if (isset($brand_logos[$brand_name]['image_urls'])) {
+        return $brand_logos[$brand_name]['image_urls'];
+    }
+    
+    // Return single URL wrapped in array
+    if (isset($brand_logos[$brand_name]['image_url'])) {
+        return [$brand_logos[$brand_name]['image_url']];
+    }
+    
+    return ['https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/smartphone.svg'];
 }
 
 /**
