@@ -1,13 +1,14 @@
 <?php
 /**
  * Brand Logo Configuration
- * Uses CDN sources with embedded SVG fallback
+ * Uses high-quality PNG/SVG logos from reliable CDNs
+ * With embedded SVG fallback for robustness
  */
 
 // Embedded SVG logos (these will ALWAYS work)
 $embedded_svgs = [
-    'Realme' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="50" height="50"><defs><style>.realme-text{font-size:24px;font-weight:bold;fill:#00a699;font-family:Arial}</style></defs><text x="100" y="110" text-anchor="middle" class="realme-text">Re</text></svg>',
-    'OPPO' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="50" height="50"><defs><style>.oppo-text{font-size:28px;font-weight:bold;fill:#1f1f1f;font-family:Arial}</style></defs><text x="100" y="110" text-anchor="middle" class="oppo-text">OP</text></svg>',
+    'Realme' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" preserveAspectRatio="xMidYMid meet"><defs><style>.realme-circle{fill:none;stroke:#00a699;stroke-width:3}.realme-text{font-size:32px;font-weight:700;fill:#00a699;font-family:Arial,sans-serif;letter-spacing:-1px}</style></defs><circle class="realme-circle" cx="50" cy="50" r="42"/><text x="50" y="62" text-anchor="middle" class="realme-text">Re</text></svg>',
+    'OPPO' => '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" preserveAspectRatio="xMidYMid meet"><defs><style>.oppo-circle{fill:none;stroke:#1f1f1f;stroke-width:3}.oppo-text{font-size:36px;font-weight:700;fill:#1f1f1f;font-family:Arial,sans-serif}</style></defs><circle class="oppo-circle" cx="50" cy="50" r="42"/><text x="50" y="62" text-anchor="middle" class="oppo-text">OP</text></svg>',
 ];
 
 $brand_logos = [
@@ -33,7 +34,13 @@ $brand_logos = [
         'alt' => 'Vivo Logo'
     ],
     'Realme' => [
-        'image_url' => 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/smartphone.svg',
+        // Primary: PNG from multiple CDN mirrors (most reliable for Realme)
+        'image_urls' => [
+            'https://static.realme.com/static/images/realme_logo.png',
+            'https://cdn-images-1.medium.com/max/1200/1*VSHo3EWShE6d0Hw0-_lYOA.png',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Realme_logo.svg/1024px-Realme_logo.svg.png'
+        ],
+        'image_url' => 'https://static.realme.com/static/images/realme_logo.png', // Primary
         'alt' => 'Realme Logo',
         'has_embedded' => true
     ]
@@ -75,8 +82,8 @@ function get_brand_logo_html($brand_name, $attributes = []) {
         $svg_id = 'svg-' . str_replace(' ', '-', strtolower($brand_name));
         return sprintf(
             '<div style="position:relative;display:inline-block;%s" data-brand="%s">
-                <img src="%s" alt="%s" class="%s" style="%s" loading="lazy" onerror="this.style.display=\'none\';document.getElementById(\'%s\').style.display=\'inline-block\'">
-                <div id="%s" style="display:none;%s">%s</div>
+                <img src="%s" alt="%s" class="%s" style="%s;object-fit:contain" loading="lazy" onerror="this.style.display=\'none\';document.getElementById(\'%s\').style.display=\'flex\'">
+                <div id="%s" style="display:none;%s;align-items:center;justify-content:center">%s</div>
             </div>',
             $style,
             htmlspecialchars($brand_name),
@@ -92,7 +99,7 @@ function get_brand_logo_html($brand_name, $attributes = []) {
     } else {
         // Simple img tag
         return sprintf(
-            '<img src="%s" alt="%s" class="%s" style="%s" loading="lazy">',
+            '<img src="%s" alt="%s" class="%s" style="%s;object-fit:contain" loading="lazy">',
             htmlspecialchars($logo_url),
             $alt_text,
             htmlspecialchars($class),
@@ -131,7 +138,7 @@ function get_brand_logo_with_visual_fallback($brand_name, $fallback_color = '#f0
         );
     }
     
-    $logo_url = $logo_data['image_url'];
+    $logo_url = isset($logo_data['image_url']) ? $logo_data['image_url'] : 'https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/smartphone.svg';
     $alt_text = htmlspecialchars($brand_name);
     $embedded_svg = get_brand_embedded_svg($brand_name);
     $initials = substr($brand_name, 0, 2);
@@ -139,7 +146,7 @@ function get_brand_logo_with_visual_fallback($brand_name, $fallback_color = '#f0
     
     if ($embedded_svg) {
         $fallback = sprintf(
-            '<div id="%s" style="position:absolute;top:0;left:0;width:100%%;height:100%%;display:none;align-items:center;justify-content:center;">%s</div>',
+            '<div id="%s" style="position:absolute;top:0;left:0;width:100%%;height:100%%;display:none;align-items:center;justify-content:center;background:#f8f9fa;border-radius:10px;">%s</div>',
             $svg_id,
             $embedded_svg
         );
