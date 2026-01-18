@@ -1,0 +1,113 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    VISUAL GUIDE: Struktur Folder Upload                       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+FOLDER STRUCTURE (YANG BENAR)
+─────────────────────────────────────────────────────────────────────────────
+
+MobileNest/
+│
+├─ admin/
+│  ├─ uploads/
+│  │  └─ produk/                    ✅ Buat folder ini
+│  │     ├─ .gitkeep
+│  │     └─ (gambar produk)
+│  │
+│  └─ kelola-produk.php
+│
+├─ uploads/
+│  ├─ pembayaran/                   ✅ Buat folder ini
+│  │  ├─ .gitkeep
+│  │  └─ (bukti pembayaran)
+│  │
+│  └─ .gitkeep
+│
+├─ produk/
+│  ├─ list-produk.php
+│  └─ detail-produk.php
+│
+└─ ...
+
+
+COMMAND REFERENCE
+─────────────────────────────────────────────────────────────────────────────
+
+WINDOWS:
+  mkdir admin\uploads\produk
+  mkdir uploads\pembayaran
+  type nul > admin\uploads\produk\.gitkeep
+  type nul > uploads\pembayaran\.gitkeep
+
+LINUX/MAC:
+  mkdir -p admin/uploads/produk uploads/pembayaran
+  touch admin/uploads/produk/.gitkeep uploads/pembayaran/.gitkeep
+  chmod 755 admin/uploads/produk uploads/pembayaran
+
+
+UPLOAD FLOW: GAMBAR PRODUK
+─────────────────────────────────────────────────────────────────────────────
+
+Admin Panel (kelola-produk.php)
+            ↓
+       Upload file → Validate → Save
+            ↓
+  admin/uploads/produk/produk_15_xxx.jpg
+            ↓
+  DB: produk.gambar = 'produk_15_xxx.jpg'
+            ↓
+       Response: "Success"
+
+
+DISPLAY FLOW: GAMBAR PRODUK
+─────────────────────────────────────────────────────────────────────────────
+
+User Page (produk/list-produk.php)
+            ↓
+  Query: SELECT gambar FROM produk
+            ↓
+  Path: ../admin/uploads/produk/produk_15_xxx.jpg
+            ↓
+  <img src="../admin/uploads/produk/..."> 
+            ↓
+       Display: 200x200px image ✅
+
+
+PATH RESOLUTION REFERENCE
+─────────────────────────────────────────────────────────────────────────────
+
+FROM ADMIN FOLDER:
+  Current:  admin/kelola-produk.php
+  Target:   admin/uploads/produk/produk_15_xxx.jpg
+  Path:     uploads/produk/produk_15_xxx.jpg  (sibling)
+
+FROM PRODUK FOLDER:
+  Current:  produk/list-produk.php
+  Target:   admin/uploads/produk/produk_15_xxx.jpg
+  Path:     ../admin/uploads/produk/produk_15_xxx.jpg  (up 1)
+
+FROM ROOT:
+  Current:  index.php
+  Target:   admin/uploads/produk/produk_15_xxx.jpg
+  Path:     admin/uploads/produk/produk_15_xxx.jpg  (direct)
+
+
+QUICK CHECKLIST
+─────────────────────────────────────────────────────────────────────────────
+
+SETUP:
+  ☐ Create: admin/uploads/produk/
+  ☐ Create: uploads/pembayaran/
+  ☐ Add: .gitkeep files
+  ☐ Update: .gitignore
+
+TESTING:
+  ☐ Upload gambar produk
+  ☐ File tersimpan?
+  ☐ Gambar tampil di list?
+  ☐ Gambar tampil di detail?
+  ☐ Database updated?
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ STATUS: READY FOR IMPLEMENTATION ✅                                         ║
+╚══════════════════════════════════════════════════════════════════════════════╝
