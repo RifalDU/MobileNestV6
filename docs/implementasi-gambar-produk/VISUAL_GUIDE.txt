@@ -1,0 +1,56 @@
+FOLDER STRUCTURE
+
+MobileNest/
+├── admin/
+│   └── uploads/
+│       └── produk/               ✅ Gambar produk
+│           ├── .gitkeep
+│           └── produk_X_xxx.jpg
+│
+└── uploads/
+    └── pembayaran/               ✅ Bukti pembayaran (root level)
+        ├── .gitkeep
+        └── pembayaran_X_xxx.jpg
+
+
+COMMAND REFERENCE
+
+WINDOWS:
+  mkdir admin\uploads\produk
+  mkdir uploads\pembayaran
+  type nul > admin\uploads\produk\.gitkeep
+  type nul > uploads\pembayaran\.gitkeep
+
+LINUX/MAC:
+  mkdir -p admin/uploads/produk uploads/pembayaran
+  touch admin/uploads/produk/.gitkeep uploads/pembayaran/.gitkeep
+  chmod 755 admin/uploads/produk uploads/pembayaran
+
+
+PATH RESOLUTION
+
+FROM ADMIN:
+  Current:  admin/kelola-produk.php
+  Product:  uploads/produk/produk_15_xxx.jpg
+  Payment:  ../uploads/pembayaran/pembayaran_5_xxx.jpg
+
+FROM PRODUK:
+  Current:  produk/list-produk.php
+  Product:  ../admin/uploads/produk/produk_15_xxx.jpg
+  Payment:  ../uploads/pembayaran/pembayaran_5_xxx.jpg
+
+FROM ROOT:
+  Current:  index.php
+  Product:  admin/uploads/produk/produk_15_xxx.jpg
+  Payment:  uploads/pembayaran/pembayaran_5_xxx.jpg
+
+
+QUICK CHECKLIST
+
+✓ Create: admin/uploads/produk/
+✓ Create: uploads/pembayaran/
+✓ Add: .gitkeep files
+✓ Update: .gitignore
+✓ Test upload
+✓ Test display
+✓ Verify database
